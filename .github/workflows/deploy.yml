@@ -1,0 +1,24 @@
+name: Deploy HTML Files
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Upload HTML files
+      uses: actions/upload-artifact@v4  # ✅ VERSÃO CORRETA
+      with:
+        name: website-files
+        path: |
+          *.html
+          *.js
+          *.css
+          bible-data.js
