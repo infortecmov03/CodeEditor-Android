@@ -1,10 +1,15 @@
-name: Android CI
+name: Android Build
 
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  release:
+    types: [published]
+
+env:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
 jobs:
   build:
@@ -20,34 +25,43 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v4
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+      with:
+        cache-write-only: ${{ github.ref != 'refs/heads/main' }}
 
     - name: Make gradlew executable
       run: chmod +x ./gradlew
 
-    - name: Build Debug APK
+    - name: Build APKs and AAB
       run: |
-        ./gradlew assembleDebug
-
-    - name: Build Release APK
-      run: |
-        ./gradlew assembleRelease
+        ./gradlew assembleDebug assembleRelease bundleRelease
 
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
       with:
-        name: app-debug
+        name: CodeEditor-Debug
         path: app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 30
 
     - name: Upload Release APK
       uses: actions/upload-artifact@v4
       with:
-        name: app-release
+        name: CodeEditor-Release
         path: app/build/outputs/apk/release/app-release.apk
+        retention-days: 30
 
-    - name: Upload AAB (App Bundle)
+    - name: Upload App Bundle
       uses: actions/upload-artifact@v4
       with:
-        name: app-bundle
+        name: CodeEditor-Bundle
         path: app/build/outputs/bundle/release/app-release.aab
+        retention-days: 30
+
+    - name: Upload Mapping File (Release)
+      if: github.event_name == 'release'
+      uses: actions/upload-artifact@v4
+      with:
+        name: mapping-file
+        path: app/build/outputs/mapping/release/mapping.txt
+        retention-days: 30
