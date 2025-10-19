@@ -1,0 +1,72 @@
+/* Customizações específicas para o Monaco Editor */
+.monaco-editor {
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', 'Monaco', monospace !important;
+}
+
+.monaco-editor .view-overlays .current-line {
+    border: none !important;
+    background-color: rgba(0, 122, 204, 0.1) !important;
+}
+
+.monaco-editor .margin {
+    background-color: #1e1e1e !important;
+}
+
+.monaco-editor .line-numbers {
+    color: #6e7681 !important;
+}
+
+.monaco-editor .cursors-layer .cursor {
+    background-color: #ffffff !important;
+}
+
+/* Sugestões e auto-complete */
+.monaco-editor .suggest-widget {
+    background: #252526 !important;
+    border: 1px solid #454545 !important;
+}
+
+.monaco-editor .suggest-widget .monaco-list .monaco-list-row {
+    color: #cccccc !important;
+}
+
+.monaco-editor .suggest-widget .monaco-list .monaco-list-row.focused {
+    background-color: #2a2d2e !important;
+}
+
+/* Error squiggles */
+.monaco-editor .squiggly-error {
+    border-bottom: 2px solid #f44747 !important;
+    background: rgba(244, 71, 71, 0.1) !important;
+}
+
+.monaco-editor .squiggly-warning {
+    border-bottom: 2px solid #ffcc02 !important;
+    background: rgba(255, 204, 2, 0.1) !important;
+}
+
+/* Scrollbars do editor */
+.monaco-scrollable-element > .scrollbar > .slider {
+    background: rgba(121, 121, 121, 0.4) !important;
+}
+
+.monaco-scrollable-element > .scrollbar > .slider:hover {
+    background: rgba(100, 100, 100, 0.7) !important;
+}
+
+/* Minimap */
+.monaco-editor .minimap {
+    background: #1e1e1e !important;
+}
+
+/* Bracket matching */
+.monaco-editor .bracket-match {
+    background-color: rgba(0, 122, 204, 0.4) !important;
+    border: 1px solid rgba(0, 122, 204, 0.8) !important;
+}
+
+/* Find widget */
+.monaco-editor .find-widget {
+    background: #252526 !important;
+    border: 1px solid #454545 !important;
+}

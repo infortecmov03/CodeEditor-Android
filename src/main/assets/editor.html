@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Código - Android</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/monaco-custom.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <select id="language" class="language-selector">
+                <option value="javascript">JavaScript</option>
+                <option value="python">Python</option>
+                <option value="html">HTML</option>
+                <option value="css">CSS</option>
+                <option value="java">Java</option>
+            </select>
+            
+            <button class="btn" onclick="runCode()" data-tooltip="Executar código (Ctrl+Enter)">
+                <span class="icon">▶</span> Executar
+            </button>
+            
+            <button class="btn btn-secondary" onclick="clearEditor()" data-tooltip="Limpar editor">
+                <span class="icon">🗑️</span> Limpar
+            </button>
+            
+            <button class="btn btn-secondary" onclick="formatCode()" data-tooltip="Formatar código">
+                <span class="icon">🔧</span> Format
+            </button>
+            
+            <div class="file-operations">
+                <input type="text" id="filename" class="filename-input" placeholder="nome_arquivo" value="script">
+                <button class="btn" onclick="saveCode()" data-tooltip="Salvar código">
+                    <span class="icon">💾</span> Salvar
+                </button>
+                <button class="btn btn-secondary" onclick="loadCode()" data-tooltip="Carregar arquivo">
+                    <span class="icon">📂</span> Abrir
+                </button>
+            </div>
+        </div>
+
+        <!-- Editor -->
+        <div class="editor-container">
+            <div id="editor"></div>
+        </div>
+
+        <!-- Output -->
+        <div class="output" id="output">
+            <div class="output-line info">
+                Editor de Código inicializado. Selecione uma linguagem e comece a programar!
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-item">
+                <span id="cursorPosition">Linha: 1, Coluna: 1</span>
+            </div>
+            <div class="status-item">
+                <span id="lineCount">Total: 0 linhas</span>
+            </div>
+            <div class="status-item">
+                <span id="languageStatus">JavaScript</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    
+   
+    
+    <script>
+        // Configurações globais e inicialização
+        let appInitialized = false;
+
+        // Inicialização quando o DOM estiver pronto
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        async function initializeApp() {
+            if (appInitialized) return;
+            
+            try {
+                // Inicializa o editor
+                await codeEditor.initialize();
+                
+                // Configura eventos
+                setupEventListeners();
+                
+                appInitialized = true;
+                addOutput('Sistema inicializado com sucesso!', 'success');
+                
+            } catch (error) {
+                addOutput('Erro ao inicializar o editor: ' + error.message, 'error');
+            }
+        }
+
+        function setupEventListeners() {
+            // Linguagem
+            document.getElementById('language').addEventListener('change', function() {
+                const language = this.value;
+                codeEditor.changeLanguage(language);
+                document.getElementById('languageStatus').textContent = 
+                    language.charAt(0).toUpperCase() + language.slice(1);
+            });
+
+            // Atalhos de teclado
+            document.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    runCode();
+                }
+                
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    saveCode();
+                }
+            });
+        }
+
+        // Funções globais chamadas pelos botões
+        function runCode() {
+            if (!window.codeExecutor) {
+                addOutput('Erro: Executor não carregado', 'error');
+                return;
+            }
+            window.codeExecutor.execute();
+        }
+
+        function clearEditor() {
+            if (confirm('Tem certeza que deseja limpar o editor?')) {
+                codeEditor.clear();
+                addOutput('Editor limpo', 'info');
+            }
+        }
+
+        function formatCode() {
+            addOutput('Formatação não implementada para esta linguagem', 'warning');
+        }
+
+        function saveCode() {
+            if (!window.fileManager) {
+                addOutput('Erro: Gerenciador de arquivos não disponível', 'error');
+                return;
+            }
+            window.fileManager.save();
+        }
+
+        function loadCode() {
+            if (!window.fileManager) {
+                addOutput('Erro: Gerenciador de arquivos não disponível', 'error');
+                return;
+            }
+            window.fileManager.load();
+        }
+
+        function addOutput(message, type = 'log') {
+            const output = document.getElementById('output');
+            const line = document.createElement('div');
+            line.className = `output-line ${type}`;
+            line.textContent = message;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Expor funções globalmente para o WebView
+        window.addOutput = addOutput;
+        window.runCode = runCode;
+    </script>
+</body>
+</html>
