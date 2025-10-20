@@ -20,30 +20,37 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v3
-      with:
-        cache-write-only: ${{ github.ref != 'refs/heads/main' }}
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
 
-    - name: Build with Gradle
-      run: gradle build
+    - name: Make gradlew executable
+      run: chmod +x ./gradlew
 
     - name: Build Debug APK
-      run: gradle assembleDebug
+      run: |
+        ./gradlew assembleDebug
 
     - name: Build Release APK
-      run: gradle assembleRelease
+      run: |
+        ./gradlew assembleRelease
+
+    - name: Verify APK files
+      run: |
+        echo "=== Verificando arquivos APK ==="
+        ls -la app/build/outputs/apk/debug/
+        ls -la app/build/outputs/apk/release/
+        find app/build/outputs/ -name "*.apk" -type f
 
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
       with:
         name: app-debug
-        path: app/build/outputs/apk/debug/app-debug.apk
+        path: app/build/outputs/apk/debug/*.apk
         retention-days: 30
 
     - name: Upload Release APK
       uses: actions/upload-artifact@v4
       with:
         name: app-release
-        path: app/build/outputs/apk/release/app-release.apk
+        path: app/build/outputs/apk/release/*.apk
         retention-days: 30
