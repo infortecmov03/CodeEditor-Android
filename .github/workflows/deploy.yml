@@ -1,24 +1,56 @@
-name: Deploy HTML Files
+name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
+    branches: [ main, master ]
+  workflow_run:
+    workflows: ["Android CI"]
+    types:
+      - completed
 
 jobs:
   deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v4
-      
-    - name: Upload HTML files
-      uses: actions/upload-artifact@v4  # ✅ VERSÃO CORRETA
+    
+    - name: Download APK artifacts
+      uses: actions/download-artifact@v4
       with:
-        name: website-files
-        path: |
-          *.html
-          *.js
-          *.css
-          bible-data.js
+        path: ./artifacts/
+    
+    - name: List downloaded artifacts
+      run: |
+        echo "=== Artifacts baixados ==="
+        find ./artifacts -type f -name "*.apk"
+        ls -la ./artifacts/
+    
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+    
+    - name: Create deployment directory
+      run: |
+        mkdir -p ./deploy
+        # Copia os APKs baixados
+        find ./artifacts -name "*.apk" -exec cp {} ./deploy/ \;
+        # Copia o index.html
+        cp index.html ./deploy/
+        # Lista arquivos no deploy
+        echo "=== Arquivos no deploy ==="
+        ls -la ./deploy/
+    
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: ./deploy/
+    
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
